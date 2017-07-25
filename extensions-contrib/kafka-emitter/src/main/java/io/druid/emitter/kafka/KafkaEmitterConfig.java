@@ -31,10 +31,8 @@ public class KafkaEmitterConfig
 
   @JsonProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG)
   final private String bootstrapServers;
-  @JsonProperty("metric.topic")
-  final private String metricTopic;
-  @JsonProperty("alert.topic")
-  final private String alertTopic;
+  @JsonProperty("topic")
+  final private String topic;
   @JsonProperty
   final private String clusterName;
   @JsonProperty("producer.config")
@@ -43,15 +41,13 @@ public class KafkaEmitterConfig
   @JsonCreator
   public KafkaEmitterConfig(
       @JsonProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG) String bootstrapServers,
-      @JsonProperty("metric.topic") String metricTopic,
-      @JsonProperty("alert.topic") String alertTopic,
+      @JsonProperty("topic") String topic,
       @JsonProperty("clusterName") String clusterName,
       @JsonProperty("producer.config") Map<String, String> kafkaProducerConfig
   )
   {
     this.bootstrapServers = Preconditions.checkNotNull(bootstrapServers, "bootstrap.servers can not be null");
-    this.metricTopic = Preconditions.checkNotNull(metricTopic, "metric.topic can not be null");
-    this.alertTopic = Preconditions.checkNotNull(alertTopic, "alert.topic can not be null");
+    this.topic = Preconditions.checkNotNull(topic, "metric.topic can not be null");
     this.clusterName = clusterName;
     this.kafkaProducerConfig = kafkaProducerConfig;
   }
@@ -63,15 +59,9 @@ public class KafkaEmitterConfig
   }
 
   @JsonProperty
-  public String getMetricTopic()
+  public String getTopic()
   {
-    return metricTopic;
-  }
-
-  @JsonProperty
-  public String getAlertTopic()
-  {
-    return alertTopic;
+    return topic;
   }
 
   @JsonProperty
@@ -101,10 +91,7 @@ public class KafkaEmitterConfig
     if (!getBootstrapServers().equals(that.getBootstrapServers())) {
       return false;
     }
-    if (!getMetricTopic().equals(that.getMetricTopic())) {
-      return false;
-    }
-    if (!getAlertTopic().equals(that.getAlertTopic())) {
+    if (!getTopic().equals(that.getTopic())) {
       return false;
     }
     if (getClusterName() != null ? !getClusterName().equals(that.getClusterName()) : that.getClusterName() != null) {
@@ -119,8 +106,7 @@ public class KafkaEmitterConfig
   public int hashCode()
   {
     int result = getBootstrapServers().hashCode();
-    result = 31 * result + getMetricTopic().hashCode();
-    result = 31 * result + getAlertTopic().hashCode();
+    result = 31 * result + getTopic().hashCode();
     result = 31 * result + (getClusterName() != null ? getClusterName().hashCode() : 0);
     result = 31 * result + (getKafkaProducerConfig() != null ? getKafkaProducerConfig().hashCode() : 0);
     return result;
@@ -131,8 +117,7 @@ public class KafkaEmitterConfig
   {
     return "KafkaEmitterConfig{" +
            "bootstrap.servers='" + bootstrapServers + '\'' +
-           ", metric.topic='" + metricTopic + '\'' +
-           ", alert.topic='" + alertTopic + '\'' +
+           ", topic='" + topic + '\'' +
            ", clusterName='" + clusterName + '\'' +
            ", Producer.config=" + kafkaProducerConfig +
            '}';

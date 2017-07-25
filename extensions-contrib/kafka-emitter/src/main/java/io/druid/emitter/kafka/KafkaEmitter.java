@@ -24,8 +24,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.metamx.emitter.core.Emitter;
 import com.metamx.emitter.core.Event;
-import com.metamx.emitter.service.AlertEvent;
-import com.metamx.emitter.service.ServiceMetricEvent;
 import io.druid.emitter.kafka.MemoryBoundLinkedBlockingQueue.ObjectContainer;
 import io.druid.java.util.common.StringUtils;
 import io.druid.java.util.common.lifecycle.LifecycleStart;
@@ -51,16 +49,13 @@ public class KafkaEmitter implements Emitter
   private static Logger log = new Logger(KafkaEmitter.class);
 
   private final static int DEFAULT_RETRIES = 3;
-  private final AtomicLong metricLost;
-  private final AtomicLong alertLost;
   private final AtomicLong invalidLost;
 
   private final KafkaEmitterConfig config;
   private final Producer<String, String> producer;
   private final Callback producerCallback;
   private final ObjectMapper jsonMapper;
-  private final MemoryBoundLinkedBlockingQueue<String> metricQueue;
-  private final MemoryBoundLinkedBlockingQueue<String> alertQueue;
+  private final MemoryBoundLinkedBlockingQueue<String> msgQueue;
   private final ScheduledExecutorService scheduler;
 
   public KafkaEmitter(KafkaEmitterConfig config, ObjectMapper jsonMapper)
@@ -72,11 +67,8 @@ public class KafkaEmitter implements Emitter
     // same with kafka producer's buffer.memory
     long queueMemoryBound = Long.parseLong(this.config.getKafkaProducerConfig()
                                                       .getOrDefault(ProducerConfig.BUFFER_MEMORY_CONFIG, "33554432"));
-    this.metricQueue = new MemoryBoundLinkedBlockingQueue<>(queueMemoryBound);
-    this.alertQueue = new MemoryBoundLinkedBlockingQueue<>(queueMemoryBound);
+    this.msgQueue = new MemoryBoundLinkedBlockingQueue<>(queueMemoryBound);
     this.scheduler = Executors.newScheduledThreadPool(3);
-    this.metricLost = new AtomicLong(0L);
-    this.alertLost = new AtomicLong(0L);
     this.invalidLost = new AtomicLong(0L);
   }
 
@@ -85,13 +77,7 @@ public class KafkaEmitter implements Emitter
     return (recordMetadata, e) -> {
       if (e != null) {
         log.debug("Event send failed [%s]", e.getMessage());
-        if (recordMetadata.topic().equals(config.getMetricTopic())) {
-          metricLost.incrementAndGet();
-        } else if (recordMetadata.topic().equals(config.getAlertTopic())) {
-          alertLost.incrementAndGet();
-        } else {
-          invalidLost.incrementAndGet();
-        }
+        invalidLost.incrementAndGet();
       }
     };
   }
@@ -120,32 +106,20 @@ public class KafkaEmitter implements Emitter
   @LifecycleStart
   public void start()
   {
-    scheduler.scheduleWithFixedDelay(this::sendMetricToKafka, 10, 10, TimeUnit.SECONDS);
-    scheduler.scheduleWithFixedDelay(this::sendAlertToKafka, 10, 10, TimeUnit.SECONDS);
+    scheduler.scheduleWithFixedDelay(this::sendToKafka, 10, 10, TimeUnit.SECONDS);
     scheduler.scheduleWithFixedDelay(() -> {
-      log.info("Message lost counter: metricLost=[%d], alertLost=[%d], invalidLost=[%d]",
-               metricLost.get(), alertLost.get(), invalidLost.get());
+      log.info("Message lost counter: invalidLost=[%d]", invalidLost.get());
     }, 5, 5, TimeUnit.MINUTES);
     log.info("Starting Kafka Emitter.");
   }
 
-  private void sendMetricToKafka()
-  {
-    sendToKafka(config.getMetricTopic(), metricQueue);
-  }
-
-  private void sendAlertToKafka()
-  {
-    sendToKafka(config.getAlertTopic(), alertQueue);
-  }
-
-  private void sendToKafka(final String topic, MemoryBoundLinkedBlockingQueue<String> recordQueue)
+  private void sendToKafka()
   {
     ObjectContainer<String> objectToSend;
     try {
       while (true) {
-        objectToSend = recordQueue.take();
-        producer.send(new ProducerRecord<>(topic, objectToSend.getData()), producerCallback);
+        objectToSend = msgQueue.take();
+        producer.send(new ProducerRecord<>(config.getTopic(), objectToSend.getData()), producerCallback);
       }
     }
     catch (InterruptedException e) {
@@ -169,15 +143,7 @@ public class KafkaEmitter implements Emitter
             resultJson,
             StringUtils.toUtf8(resultJson).length
         );
-        if (event instanceof ServiceMetricEvent) {
-          if (!metricQueue.offer(objectContainer)) {
-            metricLost.incrementAndGet();
-          }
-        } else if (event instanceof AlertEvent) {
-          if (!alertQueue.offer(objectContainer)) {
-            alertLost.incrementAndGet();
-          }
-        } else {
+        if (!msgQueue.offer(objectContainer)) {
           invalidLost.incrementAndGet();
         }
       }
