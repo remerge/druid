@@ -82,14 +82,14 @@
     <modules>
         <module>api</module>
         <module>common</module>
-        <module>examples</module>
+        <!--<module>examples</module>-->
         <module>indexing-hadoop</module>
         <module>indexing-service</module>
         <module>processing</module>
         <module>server</module>
         <module>sql</module>
         <module>services</module>
-        <module>integration-tests</module>
+        <!--<module>integration-tests</module>-->
         <module>benchmarks</module>
         <module>aws-common</module>
         <module>java-util</module>
@@ -98,40 +98,40 @@
         <module>hll</module>
         <!-- Core extensions -->
         <module>extensions-core/avro-extensions</module>
-        <module>extensions-core/caffeine-cache</module>
+        <!--<module>extensions-core/caffeine-cache</module>-->
         <module>extensions-core/datasketches</module>
-        <module>extensions-core/druid-kerberos</module>
+        <!--<module>extensions-core/druid-kerberos</module>-->
         <module>extensions-core/hdfs-storage</module>
         <module>extensions-core/histogram</module>
-        <module>extensions-core/stats</module>
+        <!--<module>extensions-core/stats</module>-->
         <module>extensions-core/kafka-eight</module>
-        <module>extensions-core/kafka-extraction-namespace</module>
-        <module>extensions-core/kafka-indexing-service</module>
+        <!--<module>extensions-core/kafka-extraction-namespace</module>-->
+        <!--<module>extensions-core/kafka-indexing-service</module>-->
         <module>extensions-core/mysql-metadata-storage</module>
-        <module>extensions-core/postgresql-metadata-storage</module>
+        <!--<module>extensions-core/postgresql-metadata-storage</module>-->
         <module>extensions-core/protobuf-extensions</module>
         <module>extensions-core/lookups-cached-global</module>
-        <module>extensions-core/lookups-cached-single</module>
-        <module>extensions-core/s3-extensions</module>
+        <!--<module>extensions-core/lookups-cached-single</module>-->
+        <!--<module>extensions-core/s3-extensions</module>-->
         <!-- Community extensions -->
-        <module>extensions-contrib/azure-extensions</module>
-        <module>extensions-contrib/cassandra-storage</module>
-        <module>extensions-contrib/druid-rocketmq</module>
-        <module>extensions-contrib/cloudfiles-extensions</module>
-        <module>extensions-contrib/graphite-emitter</module>
-        <module>extensions-contrib/kafka-eight-simpleConsumer</module>
-        <module>extensions-contrib/rabbitmq</module>
-        <module>extensions-contrib/distinctcount</module>
+        <!--<module>extensions-contrib/azure-extensions</module>-->
+        <!--<module>extensions-contrib/cassandra-storage</module>-->
+        <!--<module>extensions-contrib/druid-rocketmq</module>-->
+        <!--<module>extensions-contrib/cloudfiles-extensions</module>-->
+        <!--<module>extensions-contrib/graphite-emitter</module>-->
+        <!--<module>extensions-contrib/kafka-eight-simpleConsumer</module>-->
+        <!--<module>extensions-contrib/rabbitmq</module>-->
+        <!--<module>extensions-contrib/distinctcount</module>-->
         <module>extensions-contrib/parquet-extensions</module>
         <module>extensions-contrib/statsd-emitter</module>
-        <module>extensions-contrib/orc-extensions</module>
-        <module>extensions-contrib/time-min-max</module>
-        <module>extensions-contrib/google-extensions</module>
-        <module>extensions-contrib/virtual-columns</module>
-        <module>extensions-contrib/thrift-extensions</module>
-        <module>extensions-contrib/ambari-metrics-emitter</module>
-        <module>extensions-contrib/scan-query</module>
-        <module>extensions-contrib/sqlserver-metadata-storage</module>
+        <!--<module>extensions-contrib/orc-extensions</module>-->
+        <!--<module>extensions-contrib/time-min-max</module>-->
+        <!--<module>extensions-contrib/google-extensions</module>-->
+        <!--<module>extensions-contrib/virtual-columns</module>-->
+        <!--<module>extensions-contrib/thrift-extensions</module>-->
+        <!--<module>extensions-contrib/ambari-metrics-emitter</module>-->
+        <!--<module>extensions-contrib/scan-query</module>-->
+        <!--<module>extensions-contrib/sqlserver-metadata-storage</module>-->
         <module>extensions-contrib/kafka-emitter</module>
         <!-- distribution packaging -->
         <module>distribution</module>
