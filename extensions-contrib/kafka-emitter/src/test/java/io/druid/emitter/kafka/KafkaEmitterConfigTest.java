@@ -43,7 +43,6 @@ public class KafkaEmitterConfigTest
   public void testSerDeserKafkaEmitterConfig() throws IOException
   {
     KafkaEmitterConfig kafkaEmitterConfig = new KafkaEmitterConfig("hostname", "topicTest",
-                                                                   "clusterNameTest",
                                                                    ImmutableMap.<String, String>builder()
                                                                        .put("testKey", "testValue").build()
     );

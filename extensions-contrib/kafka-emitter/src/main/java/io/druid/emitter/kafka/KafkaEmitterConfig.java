@@ -33,8 +33,6 @@ public class KafkaEmitterConfig
   final private String bootstrapServers;
   @JsonProperty("topic")
   final private String topic;
-  @JsonProperty
-  final private String clusterName;
   @JsonProperty("producer.config")
   private Map<String, String> kafkaProducerConfig;
 
@@ -42,13 +40,11 @@ public class KafkaEmitterConfig
   public KafkaEmitterConfig(
       @JsonProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG) String bootstrapServers,
       @JsonProperty("topic") String topic,
-      @JsonProperty("clusterName") String clusterName,
       @JsonProperty("producer.config") Map<String, String> kafkaProducerConfig
   )
   {
     this.bootstrapServers = Preconditions.checkNotNull(bootstrapServers, "bootstrap.servers can not be null");
     this.topic = Preconditions.checkNotNull(topic, "metric.topic can not be null");
-    this.clusterName = clusterName;
     this.kafkaProducerConfig = kafkaProducerConfig;
   }
 
@@ -62,12 +58,6 @@ public class KafkaEmitterConfig
   public String getTopic()
   {
     return topic;
-  }
-
-  @JsonProperty
-  public String getClusterName()
-  {
-    return clusterName;
   }
 
   @JsonProperty
@@ -94,9 +84,6 @@ public class KafkaEmitterConfig
     if (!getTopic().equals(that.getTopic())) {
       return false;
     }
-    if (getClusterName() != null ? !getClusterName().equals(that.getClusterName()) : that.getClusterName() != null) {
-      return false;
-    }
     return getKafkaProducerConfig() != null
            ? getKafkaProducerConfig().equals(that.getKafkaProducerConfig())
            : that.getKafkaProducerConfig() == null;
@@ -107,7 +94,6 @@ public class KafkaEmitterConfig
   {
     int result = getBootstrapServers().hashCode();
     result = 31 * result + getTopic().hashCode();
-    result = 31 * result + (getClusterName() != null ? getClusterName().hashCode() : 0);
     result = 31 * result + (getKafkaProducerConfig() != null ? getKafkaProducerConfig().hashCode() : 0);
     return result;
   }
@@ -118,7 +104,6 @@ public class KafkaEmitterConfig
     return "KafkaEmitterConfig{" +
            "bootstrap.servers='" + bootstrapServers + '\'' +
            ", topic='" + topic + '\'' +
-           ", clusterName='" + clusterName + '\'' +
            ", Producer.config=" + kafkaProducerConfig +
            '}';
   }

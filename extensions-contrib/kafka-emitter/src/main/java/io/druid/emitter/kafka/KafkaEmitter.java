@@ -21,7 +21,6 @@ package io.druid.emitter.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
 import com.metamx.emitter.core.Emitter;
 import com.metamx.emitter.core.Event;
 import io.druid.emitter.kafka.MemoryBoundLinkedBlockingQueue.ObjectContainer;
@@ -37,7 +36,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -130,26 +128,18 @@ public class KafkaEmitter implements Emitter
   @Override
   public void emit(final Event event)
   {
-    if (event != null) {
-      ImmutableMap.Builder<String, Object> resultBuilder = ImmutableMap.<String, Object>builder().putAll(event.toMap());
-      if (config.getClusterName() != null) {
-        resultBuilder.put("clusterName", config.getClusterName());
-      }
-      Map<String, Object> result = resultBuilder.build();
-
-      try {
-        String resultJson = jsonMapper.writeValueAsString(result);
-        ObjectContainer<String> objectContainer = new ObjectContainer<>(
-            resultJson,
-            StringUtils.toUtf8(resultJson).length
-        );
-        if (!msgQueue.offer(objectContainer)) {
-          invalidLost.incrementAndGet();
-        }
-      }
-      catch (JsonProcessingException e) {
+    try {
+      String resultJson = jsonMapper.writeValueAsString(event);
+      ObjectContainer<String> objectContainer = new ObjectContainer<>(
+          resultJson,
+          StringUtils.toUtf8(resultJson).length
+          );
+      if (!msgQueue.offer(objectContainer)) {
         invalidLost.incrementAndGet();
       }
+    }
+    catch (JsonProcessingException e) {
+      invalidLost.incrementAndGet();
     }
   }
 
